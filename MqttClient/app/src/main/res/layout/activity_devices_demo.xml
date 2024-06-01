@@ -500,6 +500,10 @@
             </FrameLayout>
         </androidx.cardview.widget.CardView>
     </LinearLayout>
-
+    <service
+        android:name=".GasConcentrationService"
+        android:enabled="true"
+        android:exported="false">
+    </service>
 
 </androidx.core.widget.NestedScrollView>

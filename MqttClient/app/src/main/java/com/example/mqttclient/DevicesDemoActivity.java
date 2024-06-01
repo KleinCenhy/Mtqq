@@ -301,39 +301,75 @@ public class DevicesDemoActivity extends AppCompatActivity implements MqttServic
         unbindService(connection);
         super.onDestroy();
     }
-    public class GasSensorService extends Service {
-        // ... 其他代码 ...
+    public class GasConcentrationService {
 
+        private static final String TAG = "GasConcentrationService";
         private Handler handler = new Handler();
-        private Runnable checkSensorDataRunnable = new Runnable() {
+        private final Runnable checkGasConcentrationRunnable = new Runnable() {
             @Override
             public void run() {
-                // 假设你从传感器读取了浓度值并存储在变量concentration中
-                float concentration = readConcentrationFromSensor(); // 你需要实现这个方法
+                // 这里调用你的方法来读取气体浓度
+                float concentration = readGasConcentration();
 
+                // 检查浓度是否超过阈值
                 if (concentration > THRESHOLD) {
-                    // 创建并发送通知
+                    // 发送通知
                     sendNotification("可燃气体报警", "浓度过高，请立即处理！");
                 }
 
-                // 定时重新检查传感器数据
-                handler.postDelayed(this, CHECK_INTERVAL); // CHECK_INTERVAL是检查间隔，例如1000毫秒
+                // 根据需要重复检查
+                handler.postDelayed(this, CHECK_INTERVAL);
             }
         };
 
+        // 气体浓度检查的间隔（毫秒）
+        private static final long CHECK_INTERVAL = 10000; // 例如，每10秒检查一次
+
+        // 气体浓度的阈值
+        private static final float THRESHOLD = 50.0f; // 根据你的需求设置
+
+        // 假设这是一个方法来模拟从传感器读取气体浓度
+        private float readGasConcentration() {
+            // 这里应该是你的代码来从传感器读取浓度值
+            // 为了示例，我们返回一个模拟值
+            return 40.0f; // 示例值
+        }
+
+        // 发送通知的方法
+        private void sendNotification(String title, String message) {
+            // 这里是你的代码来创建并发送通知
+            // ...
+        }
+
+        @Override
+        public void onCreate() {
+            super.onCreate();
+            // 在这里可以初始化一些必要的资源或连接
+            // 例如，连接传感器等
+        }
+
         @Override
         public int onStartCommand(Intent intent, int flags, int startId) {
-            // 开始检查传感器数据
-            handler.post(checkSensorDataRunnable);
+            // 开始检查气体浓度
+            handler.post(checkGasConcentrationRunnable);
 
-            // 返回START_STICKY，以便在服务被杀死后自动重启
+            // 如果服务被杀死后需要重启，则返回START_STICKY
+            // 否则，返回START_NOT_STICKY或START_REDELIVER_INTENT
             return START_STICKY;
         }
 
-        // ... 其他代码 ...
+        @Override
+        public IBinder onBind(Intent intent) {
+            // 因为这个服务不需要绑定到Activity，所以返回null
+            return null;
+        }
 
-        private void sendNotification(String title, String message) {
-            // 创建通知并发送...
+        @Override
+        public void onDestroy() {
+            super.onDestroy();
+            // 在这里释放资源或断开连接
+            // 例如，断开与传感器的连接等
+            handler.removeCallbacks(checkGasConcentrationRunnable);
         }
     }
 }
