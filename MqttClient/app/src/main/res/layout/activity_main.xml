@@ -28,4 +28,11 @@
         android:layout_height="wrap_content"
         android:text="示例设备"
         android:textSize="20sp"/>
+    <Button
+        android:id="@+id/oldman_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="老人模式"
+        android:textSize="20sp"/>
+
 </LinearLayout>
