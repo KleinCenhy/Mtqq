@@ -301,5 +301,39 @@ public class DevicesDemoActivity extends AppCompatActivity implements MqttServic
         unbindService(connection);
         super.onDestroy();
     }
+    public class GasSensorService extends Service {
+        // ... 其他代码 ...
 
+        private Handler handler = new Handler();
+        private Runnable checkSensorDataRunnable = new Runnable() {
+            @Override
+            public void run() {
+                // 假设你从传感器读取了浓度值并存储在变量concentration中
+                float concentration = readConcentrationFromSensor(); // 你需要实现这个方法
+
+                if (concentration > THRESHOLD) {
+                    // 创建并发送通知
+                    sendNotification("可燃气体报警", "浓度过高，请立即处理！");
+                }
+
+                // 定时重新检查传感器数据
+                handler.postDelayed(this, CHECK_INTERVAL); // CHECK_INTERVAL是检查间隔，例如1000毫秒
+            }
+        };
+
+        @Override
+        public int onStartCommand(Intent intent, int flags, int startId) {
+            // 开始检查传感器数据
+            handler.post(checkSensorDataRunnable);
+
+            // 返回START_STICKY，以便在服务被杀死后自动重启
+            return START_STICKY;
+        }
+
+        // ... 其他代码 ...
+
+        private void sendNotification(String title, String message) {
+            // 创建通知并发送...
+        }
+    }
 }
